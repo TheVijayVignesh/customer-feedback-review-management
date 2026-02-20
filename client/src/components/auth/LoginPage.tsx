@@ -17,32 +17,137 @@ const LoginPage = () => {
 
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    setErrorMessage(''); 
-    setIsLoading(true);
+  // const handleSubmit = (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setErrorMessage(''); 
+  //   setIsLoading(true);
 
-    // Simulate server delay
-    setTimeout(() => {
-      if (isRegister) {
-        // Validation for registration
-        if (formData.password !== confirmPassword) {
-          setErrorMessage("Passwords do not match!");
-          setIsLoading(false);
-          return;
-        }
-        console.log("REGISTER DATA:", formData);
-        alert("Registration Successful!");
-        setIsRegister(false);
+  //   const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setErrorMessage(''); 
+  //   setIsLoading(true);
+
+  //   // 1. Client-side Validation
+  //   if (isRegister && formData.password !== confirmPassword) {
+  //     setErrorMessage("Passwords do not match!");
+  //     setIsLoading(false);
+  //     return;
+  //   }
+
+  //   try {
+  //     // 2. Decide which endpoint to hit
+  //     const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
+      
+  //     // 3. The real API call to your Node.js server
+  //     const response = await fetch(`http://localhost:5000${endpoint}`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         ...formData,
+  //         // If logging in, we only need email/password, but sending the object is fine
+  //       }),
+  //     });
+
+  //     const data = await response.json();
+
+  //     // 4. Handle Server Errors (e.g., 401 Unauthorized or 400 Bad Request)
+  //     if (!response.ok) {
+  //       throw new Error(data.message || "Authentication failed");
+  //     }
+
+  //     // 5. Success Logic
+  //     if (isRegister) {
+  //       alert("Registration Successful! Please login.");
+  //       setIsRegister(false); // Switch the UI to Login mode
+  //     } else {
+  //       // PROFESSIONAL STEP: Store the JWT and User Info
+  //       localStorage.setItem('token', data.token);
+  //       localStorage.setItem('userRole', data.role);
+        
+  //       // Navigate based on the role returned by the BACKEND (safer than checking local state)
+  //       if (data.role === 'ADMIN') {
+  //         navigate('/admin-dashboard');
+  //       } else {
+  //         navigate('/Trainee-dashboard');
+  //       }
+  //     }
+  //   } catch (err: any) {
+  //     // Show the actual error from the backend (e.g., "Invalid email or password")
+  //     setErrorMessage(err.message);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
+  // };
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  setErrorMessage(''); 
+  setIsLoading(true);
+
+  // 1. Client-side Validation (Check if passwords match before hitting the server)
+  if (isRegister && formData.password !== confirmPassword) {
+    setErrorMessage("Passwords do not match!");
+    setIsLoading(false);
+    return;
+  }
+
+  try {
+    // 2. Decide which endpoint to hit
+    const endpoint = isRegister ? '/api/auth/register' : '/api/auth/login';
+    
+    // 3. Prepare the payload
+    // If registering, we send name, email, password. If logging in, just email/password.
+    const payload = isRegister 
+      ? { name: formData.name, email: formData.email, password: formData.password }
+      : { email: formData.email, password: formData.password };
+
+    // 4. The real API call to your Node.js server
+    const response = await fetch(`http://localhost:5000${endpoint}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json();
+
+    // 5. Handle Server Errors (e.g., "User already exists" or "Invalid credentials")
+    if (!response.ok) {
+      throw new Error(data.message || "Authentication failed");
+    }
+
+    // 6. Success Logic
+    if (isRegister) {
+      alert("Registration Successful! Please login.");
+      setIsRegister(false); // Switch the UI to Login mode
+      // Optional: Clear the password fields for security
+      setFormData({ ...formData, password: '' });
+      setConfirmPassword('');
+    } else {
+      // PROFESSIONAL STEP: Store the JWT and User Info
+      // 'data.token' and 'data.user.role' come from your Express controller
+      localStorage.setItem('token', data.token);
+      
+      const userRole = data.user?.role || data.role; // Handle different backend response shapes
+      localStorage.setItem('userRole', userRole);
+      
+      // 7. Navigate based on the role
+      if (userRole === 'ADMIN') {
+        navigate('/admin-dashboard');
       } else {
-        // Logic for login
-        console.log("LOGIN DATA:", formData.email);
-        isAdmin ? navigate('/admin-dashboard') : navigate('/Trainee-dashboard');
+        navigate('/Trainee-dashboard');
       }
-      setIsLoading(false);
-    }, 1500);
-  };
-
+    }
+  } catch (err: any) {
+    // Show the actual error from the backend (e.g., "Invalid email or password")
+    setErrorMessage(err.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2d0a6b] via-[#5b247a] to-[#e94e77] flex flex-col text-white font-sans tracking-tight">
       
