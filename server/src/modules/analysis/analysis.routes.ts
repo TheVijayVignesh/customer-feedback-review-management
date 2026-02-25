@@ -6,6 +6,7 @@ const router = Router();
 router.get("/", trainerController.getFeedback);
 router.get("/test",trainerController.test);
 router.get("/sentiment",trainerController.getSentiment);
+router.post("/export",trainerController.fileDownload);
 //router.post("/", trainerController.createTrainer);
 
 export default router;

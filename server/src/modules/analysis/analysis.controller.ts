@@ -32,3 +32,34 @@ export const test = async (req:Request,res:Response)=>{
   res.status(200).json({success:true,data:"hello world"})
 };
 
+export const fileDownload = async (req:Request,res:Response) => {
+  try {
+    console.log("Request body:", req.body);
+    console.log("Name received:", req.body.name);
+    const { name } = req.body;
+
+    if (!name) {
+      return res.status(400).json({ message: "Name is required" });
+    }
+
+    // 🔥 Prisma Query
+    const data = await analysisService.secureDbRetrieval(name);
+
+    if (!data) {
+      return res.status(404).json({ message: "No data found" });
+    }
+
+    // 🔥 Convert JSON → CSV
+    let csv = await analysisService.fileSender(data);
+
+    // 🔥 Send as downloadable file
+    res.header("Content-Type", "text/csv");
+    res.attachment(`report-${name}.csv`);
+    return res.send(csv);
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+}
+

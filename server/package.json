@@ -19,11 +19,13 @@
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
+    "json2csv": "^6.0.0-alpha.2",
     "jsonwebtoken": "^9.0.3"
   },
   "devDependencies": {
     "@types/cors": "^2.8.19",
     "@types/express": "^5.0.6",
+    "@types/json2csv": "^5.0.7",
     "@types/node": "^25.3.0",
     "nodemon": "^3.1.11",
     "prisma": "^6.19.2",
