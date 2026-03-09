@@ -3,8 +3,6 @@ import {useState} from "react";
 import SummaryOverview from "../components/SummaryOverview";
 import StatsCards from "../components/StatsCards";
 import SentimentDistribution from "../components/SentimentDistribution";
-import SentimentInsights from "../components/SentimentInsights";
-import ReportGeneration from "../components/ReportGeneration";
 import AnalysisDataFetch from "../components/AnalysisDataFetch";
 import type { SentimentCount } from "../components/types";
 
@@ -13,23 +11,11 @@ const SentimentDashboard: React.FC = () => {
 
   // Dummy reviews (later replace with API)
   const [name,setName] = useState("");
-  const [name1,setName1] = useState("");
   const [reviews,setReviews] = useState<SentimentCount[]>([])
 
   
 
-  // const reviews = [
-  //   { id: 1, sentiment: "very_positive" },
-  //   { id: 2, sentiment: "positive" },
-  //   { id: 3, sentiment: "neutral" },
-  //   { id: 4, sentiment: "negative" },
-  //   { id: 5, sentiment: "very_positive" },
-  //   { id: 6, sentiment: "neutral" },
-  //   { id: 7, sentiment: "very_negative" },
-  // { id: 8, sentiment: "very_negative" },
-  // { id: 9, sentiment: "very_negative" },
 
-  // ];
 
  // Convert array → lookup object
 const sentimentMap = Object.fromEntries(
@@ -97,16 +83,7 @@ const sentimentData = [
         veryNegativePercent={veryNegativePercent}
       />
 
-      {/* Stats Cards */}
-      <StatsCards
-        totalReviews={totalReviews}
-        veryPositiveCount={veryPositiveCount}
-        positiveCount={positiveCount}
-        neutralCount={neutralCount}
-        negativeCount={negativeCount}
-        veryNegativeCount={veryNegativeCount}
-
-      />
+      
 
       {/* Pie Chart Distribution */}
       <SentimentDistribution
@@ -114,10 +91,9 @@ const sentimentData = [
         colors={COLORS}
       />
 
-      {/* Insights */}
-      <SentimentInsights />
+    
+      
 
-      <ReportGeneration name={name1} setName={setName1}/>
     </div>
   );
 };
