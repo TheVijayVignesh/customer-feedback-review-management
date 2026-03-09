@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
 import { PrismaClient } from '../../generated/prisma'; 
-import { generateToken } from '../utils/generateToken.js';
+import { generateToken } from '../utils/generateToken';
 
 
 
@@ -35,7 +35,7 @@ export const login = async (req: Request, res: Response) => {
   try {
     const user = await prisma.user.findUnique({ where: { email } });
 
-    // Professional check: User exists AND password matches
+    // User exists AND password matches
     if (user && (await bcrypt.compare(password, user.password))) {
       res.json({
         id: user.id,
