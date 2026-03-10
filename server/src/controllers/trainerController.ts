@@ -20,11 +20,13 @@ export const getAllTrainers = catchAsync(async (req: Request, res: Response) => 
 
     let totalRating = 0;
     let feedbackCount = 0;
+    let uniqueTrainees = new Set();
 
     trainer.courses.forEach((course) => {
       course.feedbacks.forEach((fb) => {
         totalRating += fb.rating;
         feedbackCount++;
+        uniqueTrainees.add(fb.traineeId);
       });
     });
 
@@ -43,9 +45,9 @@ export const getAllTrainers = catchAsync(async (req: Request, res: Response) => 
       course: trainer.courses[0]?.title || "General",
       rating: Number(avgRating.toFixed(1)),
       avatar,
-      students: Math.floor(Math.random() * 200) + 50,
-      experience: trainer.expertise || "5 yrs",
-      bio: trainer.expertise || "Expert trainer at our academy."
+      students: uniqueTrainees.size,
+      experience: trainer.expertise ? `${trainer.expertise}` : "5 yrs",
+      bio: trainer.expertise ? `Expert trainer with focus on ${trainer.expertise}.` : "Expert trainer at our academy."
     };
   });
 

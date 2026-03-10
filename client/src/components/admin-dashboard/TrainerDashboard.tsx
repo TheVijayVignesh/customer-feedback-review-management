@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
 import TrainerCard from "./TrainerCard";
 import type { Trainer, Course } from "./types";
@@ -8,6 +9,12 @@ const TrainerDashboard: React.FC = () => {
     const [trainers, setTrainers] = useState<Trainer[]>([]);
     const [selectedCourse, setSelectedCourse] = useState<Course>("All");
     const [search, setSearch] = useState("");
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        sessionStorage.clear();
+        navigate('/login');
+    };
 
     // Fetch trainers from backend
     useEffect(() => {
@@ -59,14 +66,24 @@ const TrainerDashboard: React.FC = () => {
                         </p>
                     </div>
 
-                    <div className="search-wrap">
-                        <span className="search-icon">🔍</span>
-                        <input
-                            className="search-input"
-                            placeholder="Search by name or course…"
-                            value={search}
-                            onChange={(e) => setSearch(e.target.value)}
-                        />
+                    <div className="search-wrap" style={{ display: 'flex', gap: '16px' }}>
+                        <div style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                            <span className="search-icon">🔍</span>
+                            <input
+                                className="search-input"
+                                placeholder="Search by name or course…"
+                                value={search}
+                                onChange={(e) => setSearch(e.target.value)}
+                            />
+                        </div>
+                        <button 
+                            onClick={handleLogout}
+                            style={{ background: 'rgba(233,78,119,0.22)', border: '1px solid rgba(233, 78, 119, 0.4)', borderRadius: '25px', padding: '10px 24px', color: '#f0eaff', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'inherit' }}
+                            onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(233,78,119,0.4)'; e.currentTarget.style.transform = 'scale(1.05)'; }}
+                            onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(233,78,119,0.22)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                        >
+                            Logout 🚪
+                        </button>
                     </div>
                 </header>
 
