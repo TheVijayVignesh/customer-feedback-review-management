@@ -15,13 +15,22 @@ export default function ResponsePage() {
   const [search, setSearch] = useState('');
   const [selected, setSelected] = useState<Feedback | null>(null);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function load() {
     setLoading(true);
-    const [s, f] = await Promise.all([fetchStats(), fetchFeedbacks(filter, search)]);
-    setStats(s);
-    setFeedbacks(f);
-    setLoading(false);
+    setError(null);
+    try {
+      const [s, f] = await Promise.all([fetchStats(), fetchFeedbacks(filter, search)]);
+      setStats(s);
+      setFeedbacks(f);
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to load data';
+      setError(errorMsg);
+      console.error('Error loading data:', err);
+    } finally {
+      setLoading(false);
+    }
   }
 
   useEffect(() => {
@@ -30,9 +39,15 @@ export default function ResponsePage() {
   }, [filter, search]);
 
   const handleSubmit = async (id: number, message: string) => {
-    await submitResponse(id, message);
-    // refresh
-    await load();
+    try {
+      await submitResponse(id, message);
+      // refresh
+      await load();
+    } catch (err) {
+      const errorMsg = err instanceof Error ? err.message : 'Failed to submit response';
+      setError(errorMsg);
+      console.error('Error submitting response:', err);
+    }
   };
 
   return (
@@ -48,6 +63,20 @@ export default function ResponsePage() {
       </div>
 
       <div className="max-w-[1100px] mx-auto px-8 py-8">
+        {error && (
+          <div className="bg-red-500/20 border border-red-500 text-red-200 px-4 py-3 rounded mb-6">
+            <p className="font-semibold">Error loading data</p>
+            <p className="text-sm">{error}</p>
+            <p className="text-sm mt-2">Make sure the backend server is running on http://localhost:3001</p>
+            <button 
+              onClick={() => load()}
+              className="mt-3 px-4 py-2 bg-red-600 hover:bg-red-700 rounded text-white text-sm"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+        
         <div className="flex gap-3 items-center mb-6">
           <SearchBox value={search} onChange={e => setSearch(e.target.value)} />
           <FilterDropdown

@@ -32,8 +32,8 @@ export class FeedbackController {
       console.log('Query params:', { filter, search }); // Debug log
       
       const feedbacks = await feedbackService.getFeedbacks({
-        filter: filter as 'all' | 'replied' | 'pending',
-        search: search as string
+        filter: (filter as 'all' | 'replied' | 'pending') || 'all',
+        search: (search as string) || ''
       });
       
       console.log('Found feedbacks:', feedbacks.length); // Debug log
@@ -80,11 +80,23 @@ export class FeedbackController {
       
       const response: ApiResponse<any> = {
         success: true,
-        data: feedback
+        data: {
+          id: feedback.id,
+          rating: feedback.rating,
+          review: feedback.review,
+          sentiment: feedback.sentiment,
+          traineeId: feedback.traineeId,
+          courseId: feedback.courseId,
+          trainee: feedback.trainee,
+          course: feedback.course,
+          response: feedback.response,
+          createdAt: feedback.createdAt
+        }
       };
       
       res.json(response);
     } catch (error) {
+      console.error('Error in getFeedbackById:', error);
       const response: ApiResponse<any> = {
         success: false,
         error: error instanceof Error ? error.message : 'Failed to fetch feedback'

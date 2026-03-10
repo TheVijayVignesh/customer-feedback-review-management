@@ -33,11 +33,11 @@ export class FeedbackService {
       whereClause.response = null;
     }
     
-    if (search.trim()) {
+    if (search && search.trim()) {
       whereClause.OR = [
-        { trainee: { name: { contains: search, mode: 'insensitive' } } },
-        { course: { title: { contains: search, mode: 'insensitive' } } },
-        { review: { contains: search, mode: 'insensitive' } } 
+        { trainee: { name: { contains: search } } },
+        { course: { title: { contains: search } } },
+        { review: { contains: search } } 
       ];
       console.log('Search whereClause:', JSON.stringify(whereClause, null, 2)); // Debug log
     }
@@ -58,25 +58,32 @@ export class FeedbackService {
     
     console.log('Database query returned:', feedbacks.length, 'results'); // Debug log
     
-    return feedbacks.map(feedback => ({
-      id: feedback.id,
-      studentName: feedback.trainee.name,
-      rating: feedback.rating,
-      ratingLabel: this.getRatingLabel(feedback.sentiment),
-      comment: feedback.review,
-      course: feedback.course.title,
-      date: feedback.createdAt.toISOString().slice(0, 10),
-      status: feedback.response ? 'replied' : 'pending',
-      response: feedback.response ? {
-        adminName: feedback.response.admin.name,
-        message: feedback.response.message,
-        date: feedback.response.createdAt.toISOString().slice(0, 10)
-      } : null
-    }));
+    return feedbacks.map(feedback => {
+      if (!feedback.trainee || !feedback.course) {
+        console.warn(`Incomplete feedback data for ID ${feedback.id}`);
+        throw new Error(`Incomplete feedback data for feedback ID ${feedback.id}`);
+      }
+      
+      return {
+        id: feedback.id,
+        studentName: feedback.trainee.name,
+        rating: feedback.rating,
+        ratingLabel: this.getRatingLabel(feedback.sentiment),
+        comment: feedback.review,
+        course: feedback.course.title,
+        date: feedback.createdAt.toISOString().slice(0, 10),
+        status: feedback.response ? 'replied' : 'pending',
+        response: feedback.response ? {
+          adminName: feedback.response.admin?.name || 'Unknown',
+          message: feedback.response.message,
+          date: feedback.response.createdAt.toISOString().slice(0, 10)
+        } : null
+      };
+    });
   }
 
   async getFeedbackById(id: number) {
-    return await prisma.feedback.findUnique({
+    const feedback = await prisma.feedback.findUnique({
       where: { id },
       include: {
         trainee: true,
@@ -88,6 +95,23 @@ export class FeedbackService {
         }
       }
     });
+    
+    if (!feedback) {
+      return null;
+    }
+    
+    return {
+      id: feedback.id,
+      rating: feedback.rating,
+      review: feedback.review,
+      sentiment: feedback.sentiment,
+      traineeId: feedback.traineeId,
+      courseId: feedback.courseId,
+      trainee: feedback.trainee,
+      course: feedback.course,
+      response: feedback.response,
+      createdAt: feedback.createdAt
+    };
   }
 
   private getRatingLabel(sentiment: string): string {
@@ -98,6 +122,7 @@ export class FeedbackService {
       'GOOD': 'Good',
       'VERY_GOOD': 'Very Good'
     };
+    return sentimentMap[sentiment] || sentiment || 'Neutral';
     return sentimentMap[sentiment] || 'Neutral';
   }
 }
