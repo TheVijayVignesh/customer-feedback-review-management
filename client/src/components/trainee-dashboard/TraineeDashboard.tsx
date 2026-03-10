@@ -1,5 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
+import StudentDashboard from '../student-review/StudentDashboard';
+
 
 const TraineeDashboard = () => {
   const navigate = useNavigate();
@@ -21,10 +23,7 @@ const TraineeDashboard = () => {
         </button>
       </div>
       
-      <div className="mt-8 bg-white p-10 rounded-3xl shadow-sm text-center">
-        <h2 className="text-xl font-bold">Welcome, Trainee!</h2>
-        <p className="text-gray-500">Ready to submit your trainer review?</p>
-      </div>
+      return <StudentDashboard />;
     </div>
   );
 };

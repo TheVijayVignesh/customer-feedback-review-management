@@ -5,6 +5,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import LoginPage from './components/auth/LoginPage';
 import AdminDashboard from './components/admin-dashboard/AdminDashboard';
 import TraineeDashboard from './components/trainee-dashboard/TraineeDashboard';
+import StudentDashboard from './components/student-review/StudentDashboard';
+import FeedbackForm from './components/student-review/FeedbackForm';
 
 const ProtectedRoute = ({ children, allowedRole }: { children: JSX.Element, allowedRole: string }) => {
   const token = sessionStorage.getItem('token');
@@ -32,6 +34,13 @@ function App() {
           <ProtectedRoute allowedRole="TRAINEE">
             <TraineeDashboard />
           </ProtectedRoute>
+        } />
+
+          <Route path="/trainee-dashboard" element={
+          <ProtectedRoute allowedRole="TRAINEE"><StudentDashboard /></ProtectedRoute>
+        } />
+        <Route path="/trainee-dashboard/feedback/:courseId" element={
+          <ProtectedRoute allowedRole="TRAINEE"><FeedbackForm /></ProtectedRoute>
         } />
 
         <Route path="/" element={<Navigate to="/login" />} />
