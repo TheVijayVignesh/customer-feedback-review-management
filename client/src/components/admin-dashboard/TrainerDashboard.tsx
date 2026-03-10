@@ -78,9 +78,7 @@ const TrainerDashboard: React.FC = () => {
                         </div>
                         <button 
                             onClick={handleLogout}
-                            style={{ background: 'rgba(233,78,119,0.22)', border: '1px solid rgba(233, 78, 119, 0.4)', borderRadius: '25px', padding: '10px 24px', color: '#f0eaff', fontWeight: 'bold', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'inherit' }}
-                            onMouseOver={(e) => { e.currentTarget.style.background = 'rgba(233,78,119,0.4)'; e.currentTarget.style.transform = 'scale(1.05)'; }}
-                            onMouseOut={(e) => { e.currentTarget.style.background = 'rgba(233,78,119,0.22)'; e.currentTarget.style.transform = 'scale(1)'; }}
+                            className="px-8 py-3 rounded-full bg-pink-500/22 hover:bg-pink-500/40 border border-pink-500/40 text-purple-100 font-bold cursor-pointer transition-all duration-200 hover:scale-105"
                         >
                             Logout 🚪
                         </button>
@@ -99,6 +97,13 @@ const TrainerDashboard: React.FC = () => {
                         ))}
                     </div>
                 )}
+
+                <button 
+                    onClick={() => navigate('/admin-dashboard/sentiment-dashboard')}
+                    className="fixed bottom-8 right-8 px-16 py-6 rounded-full bg-pink-500/20 border border-pink-500/40 text-purple-100 font-bold cursor-pointer transition-all duration-300 ease-in-out text-base shadow-lg hover:bg-pink-500/40 hover:shadow-xl hover:-translate-y-1 z-10"
+                >
+                    📊 View Analytics
+                </button>
             </main>
         </div>
     );

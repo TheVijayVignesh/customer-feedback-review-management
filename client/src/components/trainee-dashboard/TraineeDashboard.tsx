@@ -23,7 +23,7 @@ const TraineeDashboard = () => {
         </button>
       </div>
       
-      return <StudentDashboard />;
+       <StudentDashboard />;
     </div>
   );
 };
