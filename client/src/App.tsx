@@ -7,6 +7,7 @@ import AdminDashboard from './components/admin-dashboard/AdminDashboard';
 import TraineeDashboard from './components/trainee-dashboard/TraineeDashboard';
 import StudentDashboard from './components/student-review/StudentDashboard';
 import FeedbackForm from './components/student-review/FeedbackForm';
+import SentimentDashboard from "./pages/SentimentDashboard";
 
 const ProtectedRoute = ({ children, allowedRole }: { children: JSX.Element, allowedRole: string }) => {
   const token = sessionStorage.getItem('token');
@@ -42,6 +43,11 @@ function App() {
         <Route path="/trainee-dashboard/feedback/:courseId" element={
           <ProtectedRoute allowedRole="TRAINEE"><FeedbackForm /></ProtectedRoute>
         } />
+          
+          <Route path="/sentiment-dashboard" element={
+          <ProtectedRoute allowedRole="ADMIN"><SentimentDashboard /></ProtectedRoute>
+        } />
+
 
         <Route path="/" element={<Navigate to="/login" />} />
       </Routes>
