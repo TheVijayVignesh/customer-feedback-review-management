@@ -248,15 +248,14 @@ sudo netstat -tlnp | grep 8080
 **Solution**:
 1. Verify DATABASE_URL format is correct:
    ```
-   postgresql://username:password@hostname:5432/database
+   mysql://username:password@hostname:3306/database
    ```
 
 2. Test from EC2:
    ```bash
    ssh -i your-key.pem ec2-user@your-ip
-   docker exec -it feedback-server sh
-   # Inside container:
-   curl -X GET postgresql://$DATABASE_URL
+   docker-compose exec mysql mysql -u feedback_user -p
+   # Enter password and run: SELECT 1;
    ```
 
 3. Check database server:

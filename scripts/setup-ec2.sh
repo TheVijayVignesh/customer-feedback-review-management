@@ -127,7 +127,7 @@ ${YELLOW}Important: Ensure your EC2 Security Group has these inbound rules:${NC}
   • Port 22 (SSH): 0.0.0.0/0 (or restricted to your IP)
   • Port 80 (HTTP): 0.0.0.0/0
   • Port 8080 (API): 0.0.0.0/0 (or only from frontend)
-  • Port 5432 (PostgreSQL): Only from within security group (if needed)
+  • Port 3306 (MySQL): Only from within security group (if needed)
 
 Visit AWS Console → EC2 → Security Groups to configure.
 
@@ -157,10 +157,11 @@ generate_env() {
     print_section "Generating .env template"
     
     cat > /opt/feedback-app/.env.example << 'EOF'
-# PostgreSQL Configuration
-POSTGRES_USER=feedback_user
-POSTGRES_PASSWORD=change-this-strong-password
-POSTGRES_DB=feedback_db
+# MySQL Configuration
+MYSQL_DATABASE=feedback_db
+MYSQL_USER=feedback_user
+MYSQL_PASSWORD=change-this-strong-password
+MYSQL_ROOT_PASSWORD=change-this-strong-root-password
 
 # Backend Configuration
 JWT_SECRET=change-this-to-random-32-chars-secret

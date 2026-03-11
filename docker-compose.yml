@@ -1,24 +1,25 @@
 version: '3.8'
 
 services:
-  # PostgreSQL Database
-  postgres:
-    image: postgres:16-alpine
-    container_name: feedback-postgres
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: feedback-mysql
     environment:
-      POSTGRES_USER: ${POSTGRES_USER:-feedback_user}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-feedback_password}
-      POSTGRES_DB: ${POSTGRES_DB:-feedback_db}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-feedback_db}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
+      MYSQL_USER: ${MYSQL_USER:-feedback_user}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-feedback_password}
     ports:
-      - "5432:5432"
+      - "3306:3306"
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - mysql_data:/var/lib/mysql
       - ./init-db.sql:/docker-entrypoint-initdb.d/init.sql:ro
     networks:
       - feedback-net
     restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-feedback_user}"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "${MYSQL_USER:-feedback_user}"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -33,12 +34,12 @@ services:
     image: feedback-server:latest
     container_name: feedback-server
     depends_on:
-      postgres:
+      mysql:
         condition: service_healthy
     environment:
       PORT: 8080
       NODE_ENV: production
-      DATABASE_URL: postgresql://${POSTGRES_USER:-feedback_user}:${POSTGRES_PASSWORD:-feedback_password}@postgres:5432/${POSTGRES_DB:-feedback_db}
+      DATABASE_URL: mysql://${MYSQL_USER:-feedback_user}:${MYSQL_PASSWORD:-feedback_password}@mysql:3306/${MYSQL_DATABASE:-feedback_db}
       JWT_SECRET: ${JWT_SECRET:-change-me-in-production}
       CORS_ORIGIN: ${CORS_ORIGIN:-http://localhost}
     ports:
@@ -84,7 +85,7 @@ services:
         max-file: "3"
 
 volumes:
-  postgres_data:
+  mysql_data:
     driver: local
 
 networks:

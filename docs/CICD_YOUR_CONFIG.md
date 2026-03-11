@@ -5,7 +5,7 @@ This document is specific to your team's setup. Share this with your platform en
 ## Your Setup Summary
 
 ✅ **Branch Strategy**: `deployment` branch for all deployments  
-✅ **Database**: Docker container on EC2 (PostgreSQL)  
+✅ **Database**: Docker container on EC2 (MySQL 8.0)  
 ✅ **Registry**: Docker Hub  
 ✅ **Environment**: Single production EC2 instance  
 ✅ **Notifications**: MS Teams  
@@ -26,7 +26,7 @@ AWS_SECRET_ACCESS_KEY     AWS IAM secret key
 EC2_HOST                  EC2 public IP or domain
 EC2_USER                  SSH user (ec2-user or ubuntu)
 EC2_SSH_KEY               EC2 SSH private key content
-DATABASE_URL              PostgreSQL connection string
+DATABASE_URL              MySQL connection string
 JWT_SECRET                JWT secret (32+ characters)
 ```
 
@@ -161,7 +161,7 @@ docker-compose logs -f
 
 ## Database Management
 
-PostgreSQL runs in Docker on EC2.
+MySQL runs in Docker on EC2.
 
 ### Connect to Database
 
@@ -178,24 +178,24 @@ SELECT version();
 ### Backup Database
 
 ```bash
-docker-compose exec postgres pg_dump -U feedback_user feedback_db > backup-$(date +%Y%m%d).sql
+docker-compose exec mysql mysqldump -u feedback_user -p${MYSQL_PASSWORD} feedback_db > backup-$(date +%Y%m%d).sql
 ```
 
 ### Restore Database
 
 ```bash
-cat backup-20260311.sql | docker-compose exec -T postgres psql -U feedback_user -d feedback_db
+docker-compose exec mysql mysql -u feedback_user -p${MYSQL_PASSWORD} feedback_db < backup-20260311.sql
 ```
 
 ### Access Database Remotely (from dev machine)
 
 ```bash
-# If security group allows port 5432
-psql postgresql://feedback_user:password@your-ec2-ip:5432/feedback_db
+# If security group allows port 3306
+mysql -h your-ec2-ip -u feedback_user -p
 
 # Or via SSH tunnel
-ssh -i your-key.pem -L 5432:localhost:5432 ec2-user@your-ec2-ip
-psql postgresql://feedback_user:password@localhost:5432/feedback_db
+ssh -i your-key.pem -L 3306:localhost:3306 ec2-user@your-ec2-ip
+mysql -h localhost -u feedback_user -p
 ```
 
 ---
@@ -347,7 +347,7 @@ docker-compose exec postgres pg_isready -U feedback_user
 
 # Check connection string format
 grep DATABASE_URL /opt/feedback-app/.env
-# Should be: postgresql://feedback_user:PASSWORD@postgres:5432/feedback_db
+# Should be: mysql://feedback_user:PASSWORD@mysql:3306/feedback_db
 ```
 
 ### Port Already in Use
@@ -414,9 +414,10 @@ docker-compose up -d
 ### For EC2 (.env file)
 
 ```
-POSTGRES_USER=feedback_user
-POSTGRES_PASSWORD=<strong-password>
-POSTGRES_DB=feedback_db
+MYSQL_DATABASE=feedback_db
+MYSQL_USER=feedback_user
+MYSQL_PASSWORD=<strong-password>
+MYSQL_ROOT_PASSWORD=<strong-root-password>
 JWT_SECRET=<32-char-secret>
 CORS_ORIGIN=http://your-ip
 VITE_API_BASE_URL=http://your-ip:8080/api
@@ -432,7 +433,7 @@ AWS_SECRET_ACCESS_KEY=<aws-secret>
 EC2_HOST=<ec2-public-ip>
 EC2_USER=ec2-user
 EC2_SSH_KEY=<4000-char-private-key>
-DATABASE_URL=postgresql://feedback_user:<password>@<host>:5432/feedback_db
+DATABASE_URL=mysql://feedback_user:<password>@<host>:3306/feedback_db
 JWT_SECRET=<32-char-secret>
 MSTEAMS_WEBHOOK=https://outlook.webhook.office.com/...
 TF_STATE_BUCKET=feedback-terraform-state-prod
@@ -459,7 +460,7 @@ Before asking for help:
 
 - GitHub Actions Docs: https://docs.github.com/en/actions
 - Docker Compose: https://docs.docker.com/compose
-- PostgreSQL: https://www.postgresql.org/docs
+- MySQL: https://dev.mysql.com/doc
 - AWS EC2: https://docs.aws.amazon.com/ec2
 - Terraform: https://www.terraform.io/docs
 
