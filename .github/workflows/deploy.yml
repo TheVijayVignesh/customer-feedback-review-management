@@ -233,7 +233,6 @@ jobs:
     if: github.ref == 'refs/heads/deployment' && github.event_name == 'push'
     environment:
       name: production
-      url: http://${{ vars.EC2_HOST_URL }}
 
     steps:
       - name: Checkout code
