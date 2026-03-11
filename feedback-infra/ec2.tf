@@ -37,10 +37,22 @@ resource "aws_instance" "feedback_app" {
   iam_instance_profile        = aws_iam_instance_profile.ec2_profile.name
   associate_public_ip_address = false
   user_data = <<-EOF
-    #!/bin/bash
-    sudo yum install -y amazon-ssm-agent
-    sudo systemctl enable amazon-ssm-agent
-    sudo systemctl start amazon-ssm-agent
-  EOF
+  #!/bin/bash
+  # SSM Agent
+  sudo yum install -y amazon-ssm-agent
+  sudo systemctl enable amazon-ssm-agent
+  sudo systemctl start amazon-ssm-agent
+
+  # Docker
+  sudo yum install -y docker
+  sudo systemctl enable docker
+  sudo service docker start
+  sudo usermod -aG docker ec2-user
+
+  # Docker Compose
+  sudo curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+  sudo chmod +x /usr/local/bin/docker-compose
+EOF
+
   tags = { Name = "feedback-app" }
 }
