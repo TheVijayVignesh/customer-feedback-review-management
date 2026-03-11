@@ -1,3 +1,5 @@
+# GitHub Actions CI/CD Pipeline for Customer Feedback Review Management
+# Fixed: Using public variables instead of secrets in environment URLs
 name: CI/CD Pipeline
 
 on:
