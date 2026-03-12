@@ -27,7 +27,7 @@ resource "aws_subnet" "public_2" {
 # Private Subnet (EC2 lives here)
 resource "aws_subnet" "private" {
   vpc_id            = aws_vpc.main.id
-  cidr_block        = "10.0.3.0/24"
+  cidr_block        = "192.60.0.3/16"
   availability_zone = "${var.aws_region}a"
   tags = { Name = "feedback-private-subnet" }
 }
