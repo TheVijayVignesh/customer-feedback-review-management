@@ -123,15 +123,11 @@ const LoginPage = () => {
               </div>
             )}
 
+            <div>
               <label className="text-sm font-bold text-gray-700">Email Address</label>
               <input 
                 type="email" 
                 value={formData.email}
-                required
-                className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-[#5b247a] text-gray-800"
-                placeholder="name@company.com"
-                onChange={(e) => setFormData({...formData, email: e.target.value})}
-              />
                 required
                 className="w-full bg-gray-50 border border-gray-200 p-3 rounded-xl outline-none focus:ring-2 focus:ring-[#5b247a] text-gray-800"
                 placeholder="name@company.com"

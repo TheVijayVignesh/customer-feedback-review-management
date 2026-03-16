@@ -1,7 +1,7 @@
 // API client for the response module.
 // Connects to the backend server for feedback and response management.
 
-const API_BASE_URL = 'http://localhost:3001/api';
+const API_BASE_URL = `${import.meta.env.VITE_API_URL}/api`;
 
 export type Response = {
   adminName: string;
